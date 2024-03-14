@@ -281,37 +281,19 @@ function velocity_harga($postid = null){
     return $html;
 }
 
+// Update jumlah pengunjung single-property
+function velocity_single_property() {
+	if(is_singular( 'property' )){
+		global $post;
+		$postID 	= $post->ID;
+		$count_key 	= 'hit';
 
-
-// Update jumlah pengunjung dengan plugin WP-Statistics
-function velocity_allpage() {
-    global $wpdb,$post;
-    $postID = $post->ID;
-    $count_key = 'hit';
-    if(empty($post))
-    return false;
-	if( function_exists( 'WP_Statistics' ) ) {
-		$table_name = $wpdb->prefix . "statistics_pages";
-		$results    = $wpdb->get_results("SELECT sum(count) as result_value FROM $table_name WHERE id = $postID");
-		$count = $results?$results[0]->result_value:'0';
-		if($count=='') {
-			delete_post_meta($postID, $count_key);
-			add_post_meta($postID, $count_key, '0');
-		} else {
-			update_post_meta($postID, $count_key, $count);
-		}
-	} else {
-        $user_ip = $_SERVER['REMOTE_ADDR']; //retrieve the current IP address of the visitor
-        $key = $user_ip . 'x' . $postID; //combine post ID & IP to form unique key
-        $value = array($user_ip, $postID); // store post ID & IP as separate values (see note)
-        $visited = get_transient($key); //get transient and store in variable
-
-        //check to see if the Post ID/IP ($key) address is currently stored as a transient
-        if ( false === ( $visited ) ) {
-
-            //store the unique key, Post ID & IP address for 12 hours if it does not exist
-           set_transient( $key, $value, 60*60*12 );
-
+        $user_ip 	= $_SERVER['REMOTE_ADDR']; 
+        $key_name	= $user_ip . 'x' . $postID; 
+		
+		if(!get_transient( $key_name )) {
+			set_transient( $key_name, $postID, 12 * HOUR_IN_SECONDS );
+			
             // now run post views function
             $count = get_post_meta($postID, $count_key, true);
             if($count==''){
@@ -322,12 +304,11 @@ function velocity_allpage() {
                 $count++;
                 update_post_meta($postID, $count_key, $count);
             }
-        }		
+		}
+
 	}
 }
-add_action( 'wp', 'velocity_allpage' );
-
-
+add_action( 'wp_head', 'velocity_single_property' );
 
 // [velocity-property]
 function velocity_property($atts){
