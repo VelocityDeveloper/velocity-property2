@@ -27,8 +27,7 @@ if (!function_exists('justg_child_enqueue_parent_style')) {
             $theme->parent()->get('Version')
         );
 
-        // $css_version = $theme->parent()->get('Version') . '.' . filemtime( get_stylesheet_directory() . '/css/custom.css' );
-        $css_version = $theme->parent()->get('Version');
+        $css_version = $theme->parent()->get('Version') . '.' . filemtime(get_stylesheet_directory() . '/css/custom.css');
         wp_enqueue_style(
             'custom-style',
             get_stylesheet_directory_uri() . '/css/custom.css',
@@ -38,7 +37,8 @@ if (!function_exists('justg_child_enqueue_parent_style')) {
 
         wp_enqueue_style(
             'velocity-google-fonts',
-            'https://fonts.googleapis.com/css?family=Playfair+Display|Space+Mono|Stint+Ultra+Expanded&display=swap', false
+            'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+            false
         );
 
         wp_enqueue_style(

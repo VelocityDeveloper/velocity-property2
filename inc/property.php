@@ -1,5 +1,4 @@
 <?php
-
 // Register Custom Post Type & Taxonomy
 add_action('init', 'velocity_admin_init');
 function velocity_admin_init() {
@@ -281,35 +280,6 @@ function velocity_harga($postid = null){
     return $html;
 }
 
-// Update jumlah pengunjung single-property
-function velocity_single_property() {
-	if(is_singular( 'property' )){
-		global $post;
-		$postID 	= $post->ID;
-		$count_key 	= 'hit';
-
-        $user_ip 	= $_SERVER['REMOTE_ADDR']; 
-        $key_name	= $user_ip . 'x' . $postID; 
-		
-		if(!get_transient( $key_name )) {
-			set_transient( $key_name, $postID, 12 * HOUR_IN_SECONDS );
-			
-            // now run post views function
-            $count = get_post_meta($postID, $count_key, true);
-            if($count==''){
-                $count = 0;
-                delete_post_meta($postID, $count_key);
-                add_post_meta($postID, $count_key, '0');
-            }else{
-                $count++;
-                update_post_meta($postID, $count_key, $count);
-            }
-		}
-
-	}
-}
-add_action( 'wp_head', 'velocity_single_property' );
-
 // [velocity-property]
 function velocity_property($atts){
     ob_start();
@@ -346,18 +316,20 @@ function velocity_property($atts){
     if($taxquery) {
         $args['tax_query'] = $taxquery;
     }
-    $wpex_query = new wp_query( $args );
+    $wpex_query = new WP_Query( $args );
     echo '<div class="velocity-property">';
     foreach( $wpex_query->posts as $post ) { setup_postdata( $post ); ?>
     <div class="border-bottom pb-2 mb-2 row">
         <?php if($show_image == 'yes'){ ?>
             <div class="col-3 pe-0">
-                <?php echo do_shortcode("[resize-thumbnail width='300' height='300' crop='false' upscale='true' post_id='".$post->ID."']"); ?>
+                <?php
+				echo velocitychild_get_post_thumbnail_html($post->ID, array('ratio' => '1x1', 'img_class' => 'img-fluid w-100 h-100 object-fit-cover'));
+				?>
             </div>
         <?php } ?>
         <div class="col">
-            <div class="mb-1"><a class="fw-bold text-dark" href="<?php echo get_the_permalink($post->ID); ?>"><?php echo get_the_title($post->ID); ?></a></div>
-            <div class="text-dark"><?php echo velocity_harga($post->ID); ?></div>
+            <div class="mb-1"><a class="fw-bold text-dark" href="<?php echo esc_url(get_the_permalink($post->ID)); ?>"><?php echo esc_html(get_the_title($post->ID)); ?></a></div>
+            <div class="text-dark"><?php echo esc_html(velocity_harga($post->ID)); ?></div>
         </div>
     </div>
     <?php }
@@ -367,3 +339,47 @@ function velocity_property($atts){
 }
 add_shortcode('velocity-property', 'velocity_property');
 
+// [property-loop]
+add_Shortcode('property-loop', 'property_loop');
+function property_loop($atts) {
+	ob_start();
+	global $post;
+	$atribut = shortcode_atts(array(
+		'post_id'	=> $post->ID, // ID post
+		'class'	=> '', // class tambahan
+		'show_button' => 'yes', // tampilkan tombol View
+	), $atts);
+	$post_id = $atribut['post_id'];
+	$class = trim((string) $atribut['class']);
+	$button = $atribut['show_button'] == 'yes' ? 'd-inline-block' : 'd-none';
+
+
+	$link = get_permalink($post_id);
+	$title = get_the_title($post_id);
+	$jumlah_lantai = get_post_meta( $post_id, 'jumlah_lantai', true );
+	$kamar_tidur = get_post_meta( $post_id, 'kamar_tidur', true );
+	$lokasis = get_the_terms($post_id, 'property-location');
+	if ($lokasis && !is_wp_error($lokasis)) {
+		$lokasi = $lokasis[0]->name;
+	} else {
+		$lokasi = '';
+	}
+	echo '<article class="' . esc_attr($class) . '">';
+		echo '<div class="card h-100 border-0 listing-item">';
+			echo velocitychild_get_post_thumbnail_html($post_id, array('ratio' => '4x3', 'wrapper_class' => 'listing-image', 'img_class' => 'img-fluid rounded w-100 h-100 object-fit-cover'));
+			echo '<div class="listing-content p-3">';
+				echo '<h4 class="card-title fw-bold mb-2">';
+					echo '<a href="' . esc_url($link) . '" class="text-decoration-none text-dark">' . esc_html(wp_trim_words($title, 10, '...')) . '</a>';
+				echo '</h4>';
+				echo '<div class="py-2">' . velocitychild_get_bootstrap_icon_html('geo-alt') . ' ' . esc_html($lokasi) . '</div>';
+				echo '<div class="listing-meta d-flex justify-content-between align-items-center mb-2">';
+					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('bed') . ' ' . esc_html($kamar_tidur) . '</span>';
+					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('house-door') . ' ' . esc_html($jumlah_lantai) . '</span>';
+					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('cash-stack') . ' ' . esc_html(velocity_harga($post_id)) . '</span>';
+					echo '<span class="' . esc_attr($button) . ' pe-2"><a class="btn btn-primary" href="' . esc_url($link) . '">View</a></span>';
+				echo '</div>';
+			echo '</div>';
+		echo '</div>';
+	echo '</article>';
+	return ob_get_clean();
+}

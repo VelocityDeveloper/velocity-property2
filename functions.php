@@ -18,14 +18,20 @@
  * Load other required files
  */
 
- $inc = get_stylesheet_directory() . '/inc';
- $includes = [
+$inc = get_stylesheet_directory() . '/inc';
+$includes = [
 	'enqueue.php',
+	'icons.php',
+	'media.php',
 	'function-child.php',
 	'shortcodes.php',
 	'property.php',
- ];
+];
 
- foreach( $includes as $include ) {
-	 require_once( $inc . '/' . $include );
- }
+foreach( $includes as $include ) {
+	require_once( $inc . '/' . $include );
+}
+/**
+ * Add custom widgets
+ */
+require_once( get_stylesheet_directory().'/widget.php' );

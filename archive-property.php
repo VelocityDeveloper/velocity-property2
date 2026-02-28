@@ -57,30 +57,18 @@ $container = velocitytheme_option( 'justg_container_type','container' );
 						do_action('justg_after_title');
 						?>
 					</header><!-- .page-header -->
-					<?php
-					// Start the loop.
-					while ( have_posts() ) {
+
+					<div class="row m-0">
+					<?php while ( have_posts() ) {
 						$status = get_post_meta( $post->ID, 'status', true );
 						$kondisi_property = get_post_meta( $post->ID, 'kondisi_property', true );
-						the_post(); ?>
-						<div class="border-bottom pb-2 mb-2 row">
-							<div class="col-3 pe-0">
-								<?php echo do_shortcode("[resize-thumbnail width='300' height='300' crop='false' upscale='true' post_id='".$post->ID."']"); ?>
-							</div>
-							<div class="col">
-								<h2 class="mb-2 fs-6"><a class="fw-bold" href="<?php echo get_the_permalink($post->ID); ?>"><?php echo get_the_title($post->ID); ?></a></h3>
-								<div class="text-primary fw-bold mb-1"><?php echo velocity_harga($post->ID); ?></div>
-                                <?php if(!empty($status)){ ?>
-                                    <div class="mb-1"><strong>Status Properti:</strong> <?php echo $status; ?></div>
-                                <?php } ?>
-                                <?php if(!empty($kondisi_property)){ ?>
-                                    <div class="mb-0"><strong>Kondisi Properti:</strong> <?php echo $kondisi_property; ?></div>
-                                <?php } ?>
-							</div>
+						the_post();
+
+						echo do_shortcode('[property-loop post_id="' . get_the_ID() . '" show_button="no" class="col-md-6 col-12 px-md-2 mb-3"]');
+					} ?>
 					</div>
-					<?php }
-				}
-				?>
+				<?php } ?>
+					
 				<!-- Display the pagination component. -->
 				<?php justg_pagination(); ?>
 			</main><!-- #main -->
