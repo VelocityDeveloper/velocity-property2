@@ -2,6 +2,12 @@
 
 Semua perubahan penting pada theme ini dicatat di file ini.
 
+## [2.0.2] - 2026-11-03
+
+### Fixed
+- Ikon kamar tidur di kartu listing tampil sebagai jempol (`bi-bed` tidak ada di Bootstrap Icons), diganti `door-closed`.
+- Ikon kamar tidur/jumlah lantai tidak ditampilkan bila nilainya kosong (mis. listing kios).
+
 ## [2.0.0] - 2026-02-28
 
 ### Added

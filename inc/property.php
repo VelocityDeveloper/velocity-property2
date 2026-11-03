@@ -373,8 +373,13 @@ function property_loop($atts) {
 				echo '</h4>';
 				echo '<div class="py-2">' . velocitychild_get_bootstrap_icon_html('geo-alt') . ' ' . esc_html($lokasi) . '</div>';
 				echo '<div class="listing-meta d-flex justify-content-between align-items-center mb-2">';
-					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('bed') . ' ' . esc_html($kamar_tidur) . '</span>';
-					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('house-door') . ' ' . esc_html($jumlah_lantai) . '</span>';
+					// Bootstrap Icons tidak punya ikon "bed" (dulu jatuh ke ikon bawaan hand-thumbs-up).
+					if ($kamar_tidur !== '') {
+						echo '<span class="fs-6 pe-2" title="' . esc_attr__('Kamar Tidur', 'justg') . '">' . velocitychild_get_bootstrap_icon_html('door-closed') . ' ' . esc_html($kamar_tidur) . '</span>';
+					}
+					if ($jumlah_lantai !== '') {
+						echo '<span class="fs-6 pe-2" title="' . esc_attr__('Jumlah Lantai', 'justg') . '">' . velocitychild_get_bootstrap_icon_html('house-door') . ' ' . esc_html($jumlah_lantai) . '</span>';
+					}
 					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('cash-stack') . ' ' . esc_html(velocity_harga($post_id)) . '</span>';
 					echo '<span class="' . esc_attr($button) . ' pe-2"><a class="btn btn-primary" href="' . esc_url($link) . '">View</a></span>';
 				echo '</div>';
