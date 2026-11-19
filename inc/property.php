@@ -276,6 +276,8 @@ function velocity_harga($postid = null){
     }
     $price = get_post_meta($post_id,'harga',true);
     $harga = preg_replace('/[^0-9]/', '', $price);
+    // Harga kosong/teks (mis. "Hubungi kami"): number_format('') = TypeError di PHP 8 -> critical error.
+    if ($harga === '') return '';
     $html = 'Rp '.number_format( $harga ,0 , ',','.' );
     return $html;
 }
@@ -380,7 +382,10 @@ function property_loop($atts) {
 					if ($jumlah_lantai !== '') {
 						echo '<span class="fs-6 pe-2" title="' . esc_attr__('Jumlah Lantai', 'justg') . '">' . velocitychild_get_bootstrap_icon_html('house-door') . ' ' . esc_html($jumlah_lantai) . '</span>';
 					}
-					echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('cash-stack') . ' ' . esc_html(velocity_harga($post_id)) . '</span>';
+					$harga_kartu = velocity_harga($post_id);
+					if ($harga_kartu !== '') {
+						echo '<span class="fs-6 pe-2">' . velocitychild_get_bootstrap_icon_html('cash-stack') . ' ' . esc_html($harga_kartu) . '</span>';
+					}
 					echo '<span class="' . esc_attr($button) . ' pe-2"><a class="btn btn-primary" href="' . esc_url($link) . '">View</a></span>';
 				echo '</div>';
 			echo '</div>';
